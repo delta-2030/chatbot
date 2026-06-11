@@ -47,6 +47,7 @@ if user_input := str.chat_input("Say something to Gloria..."):
         contents.append(types.Content(role=role, parts=[types.Part.from_text(text=msg["content"])]))
 
     # Generate response from Gemini
+    # Generate response from Gemini
     try:
         response = client.models.generate_content(
             model='gemini-2.5-flash',
@@ -54,10 +55,22 @@ if user_input := str.chat_input("Say something to Gloria..."):
             config=types.GenerateContentConfig(
                 system_instruction=GLORIA_PROMPT,
                 temperature=1.0, # High temperature makes her more creative and chaotic
+                safety_settings=[
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                    ),
+                ]
             )
         )
         gloria_response = response.text
     except Exception as e:
+        # If you want to see the actual error in your Streamlit logs instead of just the joke:
+        print(f"Error: {e}") 
         gloria_response = "Ay, Dios mío! Something went wrong with my box of wires! Try again!"
 
     # Display Gloria's response
